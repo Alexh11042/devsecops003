@@ -1,0 +1,30 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+- task: CmdLine@2
+  inputs:
+    script: |
+      docker run -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py \
+          -t https://galaxy.edu.pe/portal/ -r testreport.html
+- task: owaspzap@1
+  inputs:
+    threshold: '10000'
+    scantype: 'targetedScan'
+    url: 'https://galaxy.edu.pe/portal/'
+    port: '443'
